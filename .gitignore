@@ -1,2 +1,5 @@
 # Ignore repository documentation
 docs/
+
+# Ignore all Node.js dependencies (any package)
+node_modules/
