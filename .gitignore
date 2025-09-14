@@ -3,3 +3,10 @@ docs/
 
 # Ignore all Node.js dependencies (any package)
 node_modules/
+
+# Ignore env vars
+.env
+
+# Ignore next, ts dist
+.next/
+dist/ 
