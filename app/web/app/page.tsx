@@ -13,16 +13,16 @@ export default function Home() {
             </div>
             <nav className="flex-1 space-y-1 p-4">
               {[
-                { name: "Dashboard", active: true },
-                { name: "Clients" },
-                { name: "Carers" },
-                { name: "Scheduling" },
-                { name: "Invoices" },
-                { name: "Settings" },
+                { name: "Dashboard", active: true, href: "#" },
+                { name: "Clients", href: "#" },
+                { name: "Carers", href: "#" },
+                { name: "Scheduling", href: "/scheduling" },
+                { name: "Invoices", href: "#" },
+                { name: "Settings", href: "#" },
               ].map((item) => (
                 <a
                   key={item.name}
-                  href="#"
+                  href={item.href}
                   className={`flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                     item.active
                       ? "bg-indigo-50 text-indigo-700 border-l-2 border-indigo-600"
