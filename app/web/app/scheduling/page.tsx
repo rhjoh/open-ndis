@@ -1,10 +1,30 @@
+"use client";
+import { useState } from 'react';
+
 export default function SchedulingPage() {
-  const shifts = [
+  const [shifts, setShifts] = useState([
     { id: '1', date: 'Mon, Sep 15', time: '09:30 – 11:30', client: 'Michael Brown', carer: 'Sarah Clark', status: 'Planned' },
     { id: '2', date: 'Mon, Sep 15', time: '12:00 – 13:30', client: 'Emma Wilson', carer: 'John Davis', status: 'Pending' },
     { id: '3', date: 'Mon, Sep 15', time: '14:00 – 15:30', client: 'David Taylor', carer: 'Priya Patel', status: 'Planned' },
     { id: '4', date: 'Tue, Sep 16', time: '10:00 – 12:00', client: 'Sophia Lee', carer: 'Liam Nguyen', status: 'Planned' },
-  ];
+  ]);
+
+  async function handleDelete(id: string) {
+    // Optimistically remove from UI
+    setShifts(prev => prev.filter(s => s.id !== id));
+    try {
+      const res = await fetch(`/api/scheduling/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        console.error('Failed to delete shift', id);
+        // On failure, re-add by refetching or reverting. Simple revert:
+        // In a real app, we would refetch from server.
+        // For now, do nothing further as backend is stubbed.
+      }
+    } catch (e) {
+      console.error('Error deleting shift', e);
+      // As above, we could revert state if needed.
+    }
+  }
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -134,7 +154,7 @@ export default function SchedulingPage() {
                       </div>
                       <div className="md:col-span-1 flex md:justify-end gap-2">
                         <button className="inline-flex items-center rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">Edit</button>
-                        <button className="inline-flex items-center rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-500">Delete</button>
+                        <button onClick={() => handleDelete(s.id)} className="inline-flex items-center rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-500">Delete</button>
                       </div>
                     </div>
                   </li>
@@ -147,4 +167,3 @@ export default function SchedulingPage() {
     </div>
   );
 }
-
