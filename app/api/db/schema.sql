@@ -43,7 +43,7 @@ create table if not exists shifts (
   shift_notes text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(), -- Need to update on row write 
-  constraint chk_shift_time check (shift_end > shift_start),
+  constraint chk_shift_time check (shift_end > shift_start)
 );
 
 insert into users (username, password_hash, password_salt, email, role) values ('admin', 'password123', 'seed-admin-salt','admin@easycare.com', 'admin'); 
