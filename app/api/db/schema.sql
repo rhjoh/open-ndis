@@ -46,7 +46,7 @@ create table if not exists shifts (
   constraint chk_shift_time check (shift_end > shift_start)
 );
 
-insert into users (username, password_hash, password_salt, email, role) values ('admin', 'password123', 'seed-admin-salt','admin@easycare.com', 'admin'); 
+insert into users (username, password_hash, password_salt, email, role) values ('admin', '166fad793de3eb0d682d91c7903269462a7f9a97bf5ba4e6c44e1f16d9403c0c', 'f581744e3b6951f9de65e225c8cd04aa','admin@easycare.com', 'admin'); 
 
 insert into carers (given_name, family_name, email) values ('Sandy','Williams', 'sandy@easycare.com');
 insert into carers (given_name, family_name, email) values ('David', 'Sinclair', 'david@easycare.com');

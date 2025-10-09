@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import crypto from 'crypto';
 import { createUser, verifyPassword, sessions, setSessionCookie, clearSessionCookie, getSession, users, SESSION_TTL_MS } from '../services/auth';
+import { findUserByEmail } from '../services/userServices';
 
 const router = Router();
 
@@ -14,9 +15,13 @@ router.post('/login', async (req: Request, res: Response) => {
   if (typeof email !== 'string' || typeof password !== 'string') {
     return res.status(400).json({ error: 'invalid_request' });
   }
-  const user = users.get(email.toLowerCase());
-  if (!user) return res.status(401).json({ error: 'invalid_credentials' });
+
+  // 'invalid_credentials' on the login screen, even when the db email is correct, comes from below 
+  //  const user = users.get(email.toLowerCase());
+  const user = await findUserByEmail(email);
+  if (!user) return res.status(401).json({ error: 'invalid_credentials - no user found' });
   const ok = verifyPassword(user, password);
+  console.log(user)
   if (!ok) return res.status(401).json({ error: 'invalid_credentials' });
   const sid = crypto.randomUUID?.() ?? crypto.randomBytes(16).toString('hex');
   sessions.set(sid, { userId: user.id, expiresAt: Date.now() + SESSION_TTL_MS });
