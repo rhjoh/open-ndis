@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import cors from 'cors';
 import schedulingRouter from './routes/scheduling';
 import authRouter from './routes/auth';
 import { authRequired } from './middleware/auth';
@@ -6,6 +7,10 @@ import type { User } from './types/auth';
 
 const app = express();
 const port = process.env.PORT || 4000;
+
+app.use(cors({
+  origin: 'http://localhost:3000'
+}));
 
 app.use(express.json());
 

@@ -10,3 +10,4 @@ node_modules/
 # Ignore next, ts dist
 .next/
 dist/ 
+.DS_Store
