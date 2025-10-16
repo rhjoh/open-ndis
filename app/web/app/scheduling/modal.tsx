@@ -1,5 +1,7 @@
 "use client";
 
+import { use, useEffect } from "react";
+
 type ModalProps = {
   className?: string;
   onClose: () => void;
@@ -8,6 +10,18 @@ type ModalProps = {
 };
 
 export default function Modal({ className = "", onClose, clientList, carerList }: ModalProps) {
+  useEffect(() => {
+    const handleEscape = (e:KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    }
+
+    document.addEventListener('keydown', handleEscape)
+    return(() => {
+      document.removeEventListener('keydown', handleEscape)
+    })
+  }, [onClose])
   return (
 
     <div className='fixed inset-0 bg-black/50 z-40' onClick={onClose}>
