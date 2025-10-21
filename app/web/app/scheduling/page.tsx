@@ -48,16 +48,14 @@ export default function SchedulingPage() {
 
         setClientList(jsonClient)
         setCarerList(jsonCarers)
+        console.log(clientList)
 
       } catch (error) {
         console.error("Error making initial fetch requests")
 
       }
     }
-
       fetchData()
-      console.log(clientList)
-      console.log(carerList)
   }, [])
 
 
