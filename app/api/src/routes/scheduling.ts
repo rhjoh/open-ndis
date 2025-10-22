@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
-import { listCarers, listClients, createShift } from '../services/schedulingServices';
-import { shiftInput } from '../types/shift';
+import { listCarers, listClients, createShift, getAllShifts } from '../services/schedulingServices';
+import { ShiftInsert } from '../types/shift';
 
 const router = Router();
 
@@ -33,13 +33,14 @@ router.get('/clients', async (_req: Request, res: Response) => {
 
 router.post('/newShift', async (req: Request, res: Response) => {
   try {
-    const rawData: shiftInput = {
-      carerID: req.body.formData.carer,
-      clientID: req.body.formData.client,
+    const rawData: ShiftInsert = {
+      carerID: parseInt(req.body.formData.carer),
+      clientID: parseInt(req.body.formData.client),
       date: req.body.formData.date,
-      startTime: req.body.formData.startTime,
-      endTime: req.body.formData.endTime,
-      location: req.body.formData.location,
+      startTime: new Date(`${req.body.formData.date}T${req.body.formData.startTime}`),
+      endTime: new Date(`${req.body.formData.date}T${req.body.formData.endTime}`),
+      status: 'planned', // Should this be a number value mapped to shit status in db? 
+      location: parseInt(req.body.formData.location),
       notes: req.body.formData.notes
     };
     await createShift(rawData);
@@ -47,6 +48,15 @@ router.post('/newShift', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error creating shift:', error);
     return res.status(400).json({ error: 'bad_request' });
+  }
+})
+
+router.get('/shifts', async (req: Request, res: Response) => {
+  try {
+    const allShifts = await getAllShifts();
+    return res.status(200).json(allShifts)
+  } catch (error) {
+    console.log(error)
   }
 })
 

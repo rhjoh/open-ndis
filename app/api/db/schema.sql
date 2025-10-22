@@ -39,7 +39,7 @@ create table if not exists shifts (
   shift_start timestamptz not null, -- Might need changes here for overnight shifts. 
   shift_end timestamptz not null, -- Show shift time in users localtz or shift location tz ??? 
   shift_location_postcode int, 
-  shift_status text not null default 'planned', -- Need to define shift types (enum?)
+  shift_status text not null, -- Need to define shift types (enum?)
   shift_notes text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(), -- Need to update on row write 

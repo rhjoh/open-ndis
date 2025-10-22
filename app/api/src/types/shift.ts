@@ -1,19 +1,13 @@
-export type shiftInput = {
-  carerID: string;
-  clientID: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  location: string;
-  notes: string | null;
-};
-
 export type Shift = {
+  shiftID: number;
   carerID: number;
   clientID: number;
-  date: Date;
+  date: string;
   startTime: Date;
   endTime: Date;
+  status: string;
   location: number;
   notes: string | null;
 };
+
+export type ShiftInsert = Omit<Shift, 'shiftID'>

@@ -14,6 +14,7 @@ export default function SchedulingPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [clientList, setClientList] = useState([])
   const [carerList, setCarerList] = useState([])
+  const [allShifts, setAllShifts] = useState([])
 
   async function handleNewShift() {
     setIsCreateOpen(true);
@@ -22,21 +23,13 @@ export default function SchedulingPage() {
 
   useEffect(() => {
 
-    const fetchData = async () => {
+    const getClientsCarers = async () => {
       try {
         const [resClients, resCarers] = await Promise.all([
           // Executes both fetch calls within the same async loop? 
           // Need to look into js event loop details again! 
-          fetch('http://localhost:4000/scheduling/clients', {
-            headers: {
-              'Access-Control-Allow-Origin': '*'
-            }
-          }),
-          fetch('http://localhost:4000/scheduling/carers', {
-            headers: {
-              'Access-Control-Allow-Origin': '*',
-            }
-          }),
+          fetch('http://localhost:4000/scheduling/clients'),
+          fetch('http://localhost:4000/scheduling/carers'),
         ]
         )
 
@@ -48,14 +41,31 @@ export default function SchedulingPage() {
 
         setClientList(jsonClient)
         setCarerList(jsonCarers)
-        console.log(clientList)
 
       } catch (error) {
         console.error("Error making initial fetch requests")
+        console.log(error)
+        // TODO: Fix this
 
       }
     }
-      fetchData()
+    getClientsCarers()
+  }, [])
+
+  useEffect(() => {
+    // getAllShifts
+    const getAllShifts = async () => {
+      try {
+        const response = await fetch('http://localhost:4000/scheduling/shifts')
+        const allShifts = await response.json()
+        console.log(allShifts)
+        setAllShifts(allShifts)
+      } catch (error) {
+        console.log(error)
+      }
+
+    }
+    getAllShifts()
   }, [])
 
 
@@ -214,11 +224,11 @@ export default function SchedulingPage() {
       </div>
       {/* New Shift Modal */}
       {isCreateOpen && (
-          <Modal 
-            onClose={() => setIsCreateOpen(false)}
-            clientList={clientList}
-            carerList={carerList}
-          />
+        <Modal
+          onClose={() => setIsCreateOpen(false)}
+          clientList={clientList}
+          carerList={carerList}
+        />
       )}
     </div>
   );
