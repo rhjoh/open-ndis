@@ -22,7 +22,6 @@ export default function SchedulingPage() {
   }
 
   useEffect(() => {
-
     const getClientsCarers = async () => {
       try {
         const [resClients, resCarers] = await Promise.all([
@@ -38,15 +37,10 @@ export default function SchedulingPage() {
           resClients.json(),
           resCarers.json()
         ])
-
         setClientList(jsonClient)
         setCarerList(jsonCarers)
-
       } catch (error) {
-        console.error("Error making initial fetch requests")
-        console.log(error)
-        // TODO: Fix this
-
+        console.error("Error making initial fetch requests: ", error)
       }
     }
     getClientsCarers()
@@ -66,7 +60,7 @@ export default function SchedulingPage() {
 
     }
     getAllShifts()
-  }, [])
+  }, [isCreateOpen])
 
 
   async function handleDelete(id: string) {

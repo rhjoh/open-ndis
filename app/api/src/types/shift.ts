@@ -11,3 +11,13 @@ export type Shift = {
 };
 
 export type ShiftInsert = Omit<Shift, 'shiftID'>
+
+type PersonSummary = {
+  id: number;
+  fullName: string;
+}
+
+export type ShiftWithRelations = Shift & {
+  client: PersonSummary;
+  carer: PersonSummary;
+}

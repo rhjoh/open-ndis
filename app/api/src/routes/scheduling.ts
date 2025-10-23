@@ -36,7 +36,7 @@ router.post('/newShift', async (req: Request, res: Response) => {
     const rawData: ShiftInsert = {
       carerID: parseInt(req.body.formData.carer),
       clientID: parseInt(req.body.formData.client),
-      date: req.body.formData.date,
+      date: req.body.formData.date.trim(),
       startTime: new Date(`${req.body.formData.date}T${req.body.formData.startTime}`),
       endTime: new Date(`${req.body.formData.date}T${req.body.formData.endTime}`),
       status: 'planned', // Should this be a number value mapped to shit status in db? 
@@ -56,7 +56,8 @@ router.get('/shifts', async (req: Request, res: Response) => {
     const allShifts = await getAllShifts();
     return res.status(200).json(allShifts)
   } catch (error) {
-    console.log(error)
+    console.error('Error getting shifts: ', error)
+    return res.status(400).json({ error: 'bad_request' })
   }
 })
 

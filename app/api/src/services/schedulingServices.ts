@@ -1,6 +1,6 @@
 import { Client } from '../types/client'
 import { Carer } from '../types/carer'
-import { ShiftInsert, Shift } from '../types/shift';
+import { ShiftInsert, Shift, ShiftWithRelations } from '../types/shift';
 import pool from '../db';
 
 type dbRowCarer = {
@@ -29,8 +29,12 @@ type dbRowShift = {
   shift_location_postcode: number;
   shift_status: string;
   shift_notes: string;
-
-
+}
+// Leaving dbRowShift as is - we might use this when selecting shift by ID, etc
+// This is just a flat object. The nesting is defined by ShiftWithRelations because it extends WITH the PersonSummary Type. 
+type dbRowShiftWithRelations = dbRowShift & {
+  client_fullname: string;
+  carer_fullname: string;
 }
 
 function dbRowToCarer(row: dbRowCarer): Carer {
@@ -53,7 +57,7 @@ function dbRowToClient(row: dbRowClient): Client {
   }
 }
 
-function dbRowToShift(row: dbRowShift): Shift {
+function dbRowToShift(row: dbRowShiftWithRelations): ShiftWithRelations {
   return {
     shiftID: row.id,
     clientID: row.client_id,
@@ -63,7 +67,15 @@ function dbRowToShift(row: dbRowShift): Shift {
     endTime: row.shift_end,
     location: row.shift_location_postcode,
     status: row.shift_status,
-    notes: row.shift_notes
+    notes: row.shift_notes,
+    client: {
+      id: row.client_id,
+      fullName: row.client_fullname,
+    },
+    carer: {
+      id: row.carer_id,
+      fullName: row.carer_fullname,
+    }
   }
 }
 
@@ -80,7 +92,16 @@ export async function listClients(): Promise<Client[]> {
 }
 
 export async function getAllShifts(): Promise<Shift[]> {
-  const queryResult = await pool.query("SELECT id, client_id, carer_id, shift_date, shift_start, shift_end, shift_location_postcode, shift_status, shift_notes FROM shifts")
+  const queryResult = await pool.query(`
+    SELECT 
+      s.id, s.client_id, s.carer_id, s.shift_date, s.shift_start, s.shift_end, s.shift_location_postcode, s.shift_status, s.shift_notes,
+      client.id AS clientID,
+      client.full_name AS client_fullname,
+      carer.full_name AS carer_fullname
+    FROM shifts s
+    LEFT JOIN clients client ON s.client_id = client.id
+    LEFT JOIN carers carer ON s.carer_id = carer.id
+    `)
   const allShifts: Shift[] = queryResult.rows.map(dbRowToShift)
   return allShifts;
 }
