@@ -2,19 +2,31 @@
 import { useState, useEffect } from 'react';
 import Modal from './modal';
 
+type Shift = {
+  shiftID: string;
+  clientID: string;
+  carerID: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  status: string;
+  client: {
+    id: number;
+    fullName: string;
+  }
+  carer: {
+    id: number;
+    fullName: string;
+  }
+}
+
 export default function SchedulingPage() {
-  const [shifts, setShifts] = useState([
-    { id: '1', date: 'Mon, Sep 15', time: '09:30 – 11:30', client: 'Michael Brown', carer: 'Sarah Clark', status: 'Planned' },
-    { id: '2', date: 'Mon, Sep 15', time: '12:00 – 13:30', client: 'Emma Wilson', carer: 'John Davis', status: 'Pending' },
-    { id: '3', date: 'Mon, Sep 15', time: '14:00 – 15:30', client: 'David Taylor', carer: 'Priya Patel', status: 'Planned' },
-    { id: '4', date: 'Tue, Sep 16', time: '10:00 – 12:00', client: 'Sophia Lee', carer: 'Liam Nguyen', status: 'Planned' },
-  ]);
 
   // Modal open state
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [clientList, setClientList] = useState([])
   const [carerList, setCarerList] = useState([])
-  const [allShifts, setAllShifts] = useState([])
+  const [allShifts, setAllShifts] = useState<Shift[]>([])
 
   async function handleNewShift() {
     setIsCreateOpen(true);
@@ -51,13 +63,11 @@ export default function SchedulingPage() {
     const getAllShifts = async () => {
       try {
         const response = await fetch('http://localhost:4000/scheduling/shifts')
-        const allShifts = await response.json()
-        console.log(allShifts)
-        setAllShifts(allShifts)
+        const shifts = await response.json()
+        setAllShifts(shifts)
       } catch (error) {
         console.log(error)
       }
-
     }
     getAllShifts()
   }, [isCreateOpen])
@@ -65,9 +75,9 @@ export default function SchedulingPage() {
 
   async function handleDelete(id: string) {
     // Optimistically remove from UI
-    setShifts(prev => prev.filter(s => s.id !== id));
+    setAllShifts(prev => prev.filter(s => s.shiftID !== id));
     try {
-      const res = await fetch(`/api/scheduling/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/scheduling/${id}`, { method: 'DELETE' }); // TODO: Implement
       if (!res.ok) {
         console.error('Failed to delete shift', id);
         // On failure, re-add by refetching or reverting. Simple revert:
@@ -173,30 +183,30 @@ export default function SchedulingPage() {
                 <div className="col-span-1 text-right">Actions</div>
               </div>
               <ul className="divide-y divide-gray-200">
-                {shifts.map((s) => (
-                  <li key={s.id} className="px-4 py-4 hover:bg-gray-50">
+                {allShifts.map((s) => (
+                  <li key={s.shiftID} className="px-4 py-4 hover:bg-gray-50">
                     <div className="grid grid-cols-1 gap-3 md:grid-cols-12 md:items-center">
                       <div className="md:col-span-3 flex items-center">
                         <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-gray-600 text-sm font-semibold">
-                          {s.client.split(' ').map((n) => n[0]).slice(0, 2).join('')}
+                          {s.client.fullName.split(' ').map((n) => n[0]).slice(0, 2).join('')}
                         </div>
                         <div>
-                          <div className="text-sm font-medium text-gray-900">{s.client}</div>
+                          <div className="text-sm font-medium text-gray-900">{s.client.fullName}</div>
                           <div className="text-xs text-gray-500">Client</div>
                         </div>
                       </div>
                       <div className="md:col-span-3 flex items-center">
                         <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-gray-600 text-sm font-semibold">
-                          {s.carer.split(' ').map((n) => n[0]).slice(0, 2).join('')}
+                          {s.carer.fullName.split(' ').map((n) => n[0]).slice(0, 2).join('')}
                         </div>
                         <div>
-                          <div className="text-sm font-medium text-gray-900">{s.carer}</div>
+                          <div className="text-sm font-medium text-gray-900">{s.carer.fullName}</div>
                           <div className="text-xs text-gray-500">Carer</div>
                         </div>
                       </div>
                       <div className="md:col-span-3">
                         <div className="text-sm font-medium text-gray-900">{s.date}</div>
-                        <div className="text-xs text-gray-500">{s.time}</div>
+                        <div className="text-xs text-gray-500">{s.startTime}</div>
                       </div>
                       <div className="md:col-span-2">
                         <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${s.status === 'Planned' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'
@@ -206,7 +216,7 @@ export default function SchedulingPage() {
                       </div>
                       <div className="md:col-span-1 flex md:justify-end gap-2">
                         <button className="inline-flex items-center rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">Edit</button>
-                        <button onClick={() => handleDelete(s.id)} className="inline-flex items-center rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-500">Delete</button>
+                        <button onClick={() => handleDelete(s.shiftID)} className="inline-flex items-center rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-500">Delete</button>
                       </div>
                     </div>
                   </li>
